@@ -1,0 +1,28 @@
+#!/usr/bin/expect
+set timeout 10
+set host [lindex $argv 0]
+set port [lindex $argv 1]
+set username [lindex $argv 2]
+set password [lindex $argv 3]
+set src_file [lindex $argv 4]
+set dest_file [lindex $argv 5]
+spawn scp -P$port $username@$host:$src_file $dest_file
+expect {
+ 	#"(yes/no)?" { send "yes\r"; exp_continue }
+ 	"*assword:" { send "$password\r" }
+}
+expect "*100%"
+expect eof
+
+
+
+#!/bin/sh
+cd $(dirname $0)
+dest_path=$(pwd)
+host='10.0.10.25'
+port=27000
+username='test_user'
+password='123456'
+src_path='/home/test_dir/test_file/'
+filename=loan_sku_create_srv
+~/scp.expect $host $port $username $password "$src_path$filename" $dest_path
