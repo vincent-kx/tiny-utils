@@ -79,7 +79,7 @@ public:
 	ObjectPool(const ObjectPool &&) = delete;
 	ObjectPool & operator=(const ObjectPool &) = delete;
 
-private:
+protected:
 	std::queue<unique_ptr<T>> pool_;
 	std::size_t max_pool_size_ = 10;
 	std::mutex mutex_;

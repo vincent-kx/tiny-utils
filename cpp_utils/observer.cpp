@@ -7,12 +7,11 @@ using namespace std;
 class BaseObserverI
 {
 public:
+	BaseObserverI() = default;
+	virtual ~BaseObserverI() = default;
 	virtual void Update() {}
-	virtual ~BaseObserverI() {}
-
-protected:
-	BaseObserverI() {}
 };
+
 
 class BaseSubject
 {
@@ -76,7 +75,7 @@ public:
 			p_observer->Update();
 	}
 
-private:
+protected:
 	list<BaseObserverI *> observers_;
 	std::size_t max_observer_size_;
 };
