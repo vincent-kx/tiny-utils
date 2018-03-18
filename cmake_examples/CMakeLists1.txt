@@ -1,0 +1,38 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+SET(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
+
+add_compile_options(-std=c++0x -g -Wall -O2  -fPIC)
+
+SET(pb_path ${CMAKE_CURRENT_LIST_DIR})
+SET(PROTO_INCLUDE_PATH ${pb_path}/src)
+SET(PROTO_LIB_PATH ${pb_path}/lib)
+
+message("pb_path src:${pb_path}")
+FILE(GLOB PROTO_INPUT "${pb_path}/*.proto")
+SET(PROTOC "$ENV{BASE_3PARTY_PATH}/protobuf/bin/protoc")
+SET(PROTOC_C_OUT_FLAG --cpp_out)
+SET(PROTO_GEN_DIR ${pb_path}/src)
+
+set(PROTO_GEN)
+foreach(PROTO_FILE ${PROTO_INPUT})
+GET_FILENAME_COMPONENT(PROTO_NAME ${PROTO_FILE} NAME)
+string(REPLACE ".proto" "" PROTO_NAME ${PROTO_NAME})
+SET(CUR_PROTO_GEN
+            ${PROTO_GEN_DIR}/${PROTO_NAME}.pb.h
+            ${PROTO_GEN_DIR}/${PROTO_NAME}.pb.cc
+       )
+list(APPEND PROTO_GEN ${CUR_PROTO_GEN})
+ADD_CUSTOM_COMMAND(
+            OUTPUT ${CUR_PROTO_GEN}
+            COMMAND ${PROTOC} ${PROTO_FILE} ${PROTOC_C_OUT_FLAG} ${PROTO_GEN_DIR} -I${pb_path}
+            DEPENDS ${PROTOC} ${PROTO_FILE}
+            WORKING_DIRECTORY ${pb_path}
+            )
+endforeach(PROTO_FILE ${PROTO_INPUT})
+
+message(${PROTO_GEN})
+ADD_LIBRARY(proto STATIC ${PROTO_GEN})
+set_target_properties(proto PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(proto protobuf z rt pthread)
+
+SET_TARGET_PROPERTIES(proto PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${pb_path}/lib")
